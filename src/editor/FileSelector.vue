@@ -67,9 +67,9 @@ function doneNameFile() {
   const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
 
-  if (!/\.(vue|jsx?|tsx?|css|json)$/.test(filename)) {
+  if (!/\.(vue|jsx?|tsx?|css|json|less)$/.test(filename)) {
     store.value.errors = [
-      `Playground only supports *.vue, *.jsx?, *.tsx?, *.css, *.json files.`,
+      `Playground only supports *.vue, *.jsx?, *.tsx?, *.css, *.json, *.less files.`,
     ]
     return
   }

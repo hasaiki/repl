@@ -6,6 +6,8 @@ import type {
 } from 'vue/compiler-sfc'
 import { type Transform, transform } from 'sucrase'
 import hashId from 'hash-sum'
+// less
+import less from 'less'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
@@ -34,6 +36,12 @@ export async function compileFile(
 
   if (filename.endsWith('.css')) {
     compiled.css = code
+    return []
+  }
+  // less
+  if (filename.endsWith('.less')) {
+    const { css } = await less.render(code)
+    compiled.css = css
     return []
   }
 
@@ -74,8 +82,9 @@ export async function compileFile(
   if (errors.length) {
     return errors
   }
-
-  const styleLangs = descriptor.styles.map((s) => s.lang).filter(Boolean)
+  const styleLangs = descriptor.styles
+    .map((s) => s.lang)
+    .filter((i) => i && i !== 'less')
   const templateLang = descriptor.template?.lang
   if (styleLangs.length && templateLang) {
     return [
@@ -216,10 +225,15 @@ export async function compileFile(
     if (style.module) {
       return [`<style module> is not supported in the playground.`]
     }
-
+    let contentStyle = style.content
+    // less
+    if (style.lang === 'less') {
+      const outStyle = await less.render(contentStyle)
+      contentStyle = outStyle.css
+    }
     const styleResult = await store.compiler.compileStyleAsync({
       ...store.sfcOptions?.style,
-      source: style.content,
+      source: contentStyle,
       filename,
       id,
       scoped: style.scoped,
