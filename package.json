@@ -1,6 +1,6 @@
 {
-  "name": "@vue/repl",
-  "version": "4.4.1",
+  "name": "@ti-cli/repl",
+  "version": "0.0.1",
   "description": "Vue component for editing Vue components",
   "packageManager": "pnpm@9.9.0",
   "type": "module",
@@ -64,7 +64,7 @@
     "type": "git",
     "url": "git+https://github.com/vuejs/repl.git"
   },
-  "author": "Evan You",
+  "author": "hasaiki",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/vuejs/repl/issues"
