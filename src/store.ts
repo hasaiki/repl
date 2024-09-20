@@ -52,9 +52,7 @@ export function useStore(
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
-    ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
-      vueVersion: vueVersion.value,
-    }))
+    ;({ importMap: builtinImportMap } = useVueImportMap())
   }
   const loading = ref(false)
 
@@ -86,25 +84,6 @@ export function useStore(
         setImportMap(mergeImportMap(getImportMap(), builtinImportMap.value))
       },
       { deep: true },
-    )
-
-    watch(
-      vueVersion,
-      async (version) => {
-        if (version) {
-          const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-          loading.value = true
-          compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
-            () => (loading.value = false),
-          )
-          console.info(`[@vue/repl] Now using Vue version: ${version}`)
-        } else {
-          // reset to default
-          compiler.value = defaultCompiler
-          console.info(`[@vue/repl] Now using default Vue version`)
-        }
-      },
-      { immediate: true },
     )
 
     watch(

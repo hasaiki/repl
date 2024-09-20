@@ -1,39 +1,24 @@
 import { computed, version as currentVersion, ref } from 'vue'
 
-export function useVueImportMap(
-  defaults: {
-    runtimeDev?: string | (() => string)
-    runtimeProd?: string | (() => string)
-    serverRenderer?: string | (() => string)
-    vueVersion?: string | null
-  } = {},
-) {
-  function normalizeDefaults(defaults?: string | (() => string)) {
-    if (!defaults) return
-    return typeof defaults === 'string' ? defaults : defaults()
-  }
-
+export function useVueImportMap() {
+  const vueVersion = ref(currentVersion)
   const productionMode = ref(false)
-  const vueVersion = ref<string | null>(defaults.vueVersion || null)
   const importMap = computed<ImportMap>(() => {
-    const vue =
-      (!vueVersion.value &&
-        normalizeDefaults(
-          productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
-        )) ||
-      `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
-        vueVersion.value || currentVersion
-      }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
+    const vue = import.meta.env.PROD
+      ? './vendor/vue.runtime.esm-browser.prod.js'
+      : '/vendor/vue.runtime.esm-browser.prod.js'
+    const serverRenderer = import.meta.env.PROD
+      ? './vendor/server-renderer.esm-browser.prod.js'
+      : '/vendor/server-renderer.esm-browser.prod.js'
+    const lodash = import.meta.env.PROD
+      ? '/vendor/lodash-es/lodash.js'
+      : './vendor/lodash-es/lodash.js'
 
-    const serverRenderer =
-      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
-        vueVersion.value || currentVersion
-      }/dist/server-renderer.esm-browser.js`
     return {
       imports: {
         vue,
         'vue/server-renderer': serverRenderer,
+        lodash,
       },
     }
   })
